@@ -81,7 +81,7 @@ get_color = function (value, upBin, lowBin, Palette) {
 
 #' @title Get palette
 #' @export
-get_palette = function (palette_name, colorStep=256,
+get_palette = function (palette_name="BrBG", colorStep=10,
                         reverse=FALSE) {
 
     if (length(palette_name) > 1) {
@@ -353,10 +353,10 @@ height = height_title + height_stripe
 data_path = "/home/louis/Documents/bouleau/INRAE/project/Explore2_project/Explore2_toolbox/results/proj"
 
 infoTraject =
-    c("Fort réchauffement et fort assèchement en été",
-      "Sec toute l’année, recharge moindre en hiver",
-      "Scénario modéré en réchauffement et changement de précipitations",
-      "Scénario chaud et humide à toutes les saisons")
+    c("Fort réchauffement et fort assèchement en été", # Goron
+      "Sec toute l’année, recharge moindre en hiver", # Gerudo
+      "Scénario modéré en réchauffement et changement de précipitations", # Piaf
+      "Scénario chaud et humide à toutes les saisons") # Zora
 nameTraject =
     c(
         "HadGEM2-ES_RCP_CCLM4-8-17_CDFt",
@@ -540,99 +540,105 @@ save_stripes = function (Date, Value,
 # }
 
 
-nRiver = length(river_selection)
 
-for (traj in nameTraject) {
+
+
+# nRiver = length(river_selection)
+
+# for (traj in nameTraject) {
     
-    for (i in 1:nRiver) {
-        river = names(river_selection)[i]
-        code = river_selection[i]
+#     for (i in 1:nRiver) {
+#         river = names(river_selection)[i]
+#         code = river_selection[i]
         
-        for (var in Var) {
+#         for (var in Var) {
 
-            Value_multi = list()
+#             Value_multi = list()
             
-            for (model in Model) {            
+#             for (model in Model) {            
                 
-                traj_model = paste0(traj, "_", model)
+#                 traj_model = paste0(traj, "_", model)
 
-                meta_path = file.path(data_path,
-                                      model,
-                                      traj_model,
-                                      "meta.fst")
-                if (!file.exists(meta_path)) {
-                    next
-                }
+#                 meta_path = file.path(data_path,
+#                                       model,
+#                                       traj_model,
+#                                       "meta.fst")
+#                 if (!file.exists(meta_path)) {
+#                     next
+#                 }
                 
-                data = ASHE::read_tibble(filepath=
-                                             file.path(data_path,
-                                                       model,
-                                                       traj_model,
-                                                       analyse,
-                                                       "fst",
-                                                       paste0(var,
-                                                              ".fst")))
+#                 data = ASHE::read_tibble(filepath=
+#                                              file.path(data_path,
+#                                                        model,
+#                                                        traj_model,
+#                                                        analyse,
+#                                                        "fst",
+#                                                        paste0(var,
+#                                                               ".fst")))
 
-                data_code = data[data$Code == code,]
-                if (nrow(data_code) == 0) {
-                    next
-                }
+#                 data_code = data[data$Code == code,]
+#                 if (nrow(data_code) == 0) {
+#                     next
+#                 }
                 
-                Date = data_code$Date
-                Value = data_code[[var]]
-                Date = Date[!is.na(Value)]
-                Value = Value[!is.na(Value)]
+#                 Date = data_code$Date
+#                 Value = data_code[[var]]
+#                 Date = Date[!is.na(Value)]
+#                 Value = Value[!is.na(Value)]
 
-                Value_multi = append(Value_multi, list(Value))
+#                 Value_multi = append(Value_multi, list(Value))
 
-                # save_stripes(Date, Value,
-                #              traj, model, river, code, var,
-                #              width, height_title, height_stripe,
-                #              height)
-            }
+#                 # save_stripes(Date, Value,
+#                 #              traj, model, river, code, var,
+#                 #              width, height_title, height_stripe,
+#                 #              height)
+#             }
 
-            Value_multi = matrix(unlist(Value_multi),
-                                 nrow=length(Value_multi),
-                                 byrow=TRUE)
+#             Value_multi = matrix(unlist(Value_multi),
+#                                  nrow=length(Value_multi),
+#                                  byrow=TRUE)
             
-            Value_med = apply(Value_multi, 2, mean)
+#             Value_med = apply(Value_multi, 2, mean)
             
-            save_stripes(Date, Value_med,
-                         traj, "MULTI", river, code, var,
-                         width, height_title, height_stripe,
-                         height)
-        }
-    }
-}
+#             save_stripes(Date, Value_med,
+#                          traj, "MULTI", river, code, var,
+#                          width, height_title, height_stripe,
+#                          height)
+#         }
+#     }
+# }
 
 
-# Date = seq.Date(as.Date("1970-01-01"), as.Date("2020-12-31"), "day")
-# Value = 1:length(Date)/1000 + rnorm(length(Date), 0, 2) - 10
+Date = seq.Date(as.Date("1970-01-01"), as.Date("2020-12-31"), "day")
+Value = 1:length(Date)/1000 + rnorm(length(Date), 0, 2) - 10
 
-# plot = gg_climateStripe(Date, Value,
-#                         palette_name='RdBu',
-#                         palette_n_shade=8,
-#                         palette_reverse=TRUE,
-#                         palette_is_center=TRUE,
-#                         palette_q_extrem=0,
-#                         stripe_space_factor=0,
-#                         stripe_chunk_by="years",
-#                         stripe_chunk_reverse=TRUE,
-#                         is_x_axis=TRUE,
-#                         is_y_axis=TRUE,
-#                         x_label_format="%b",
-#                         y_label_format="%Y",
-#                         x_breaks=seq.Date(as.Date("1972-01-01"),
-#                                           as.Date("1972-12-01"),
-#                                           "months"),
-#                         x_date_breaks=ggplot2::waiver(),
-#                         y_date_breaks="years",
-#                         x_expand=ggplot2::expansion(add=c(0, 2)),
-#                         y_expand=ggplot2::expansion(add=c(10, 0)),
-#                         y_position="right",
-#                         axis_margin=ggplot2::margin(1, 1, 1, 1,
-#                                                     unit="mm"))
+plot = gg_climateStripe(Date, Value,
+                        palette_name='RdBu',
+                        palette_n_shade=8,
+                        palette_reverse=TRUE,
+                        palette_is_center=TRUE,
+                        palette_q_extrem=0,
+                        stripe_space_factor=10,
+                        stripe_chunk_by="years",
+                        stripe_chunk_reverse=TRUE,
+                        is_x_axis=TRUE,
+                        is_y_axis=TRUE,
+                        x_label_format="%b",
+                        y_label_format="%Y",
+                        x_breaks=seq.Date(as.Date("1972-01-01"),
+                                          as.Date("1972-12-01"),
+                                          "months"),
+                        x_date_breaks=ggplot2::waiver(),
+                        y_date_breaks="years",
+                        x_expand=ggplot2::expansion(add=c(0, 2)),
+                        y_expand=ggplot2::expansion(add=c(10, 0)),
+                        y_position="right",
+                        axis_margin=ggplot2::margin(1, 1, 1, 1,
+                                                    unit="mm"))
 
-# ggplot2::ggsave(plot=plot,
-# filename="climateStripe.pdf",
-# width=2000, height=6000, units="px")
+
+
+
+ggplot2::ggsave(plot=plot,
+filename="climateStripe.pdf",
+width=2000, height=6000, units="px")
